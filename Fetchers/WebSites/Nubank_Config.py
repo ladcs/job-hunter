@@ -1,3 +1,5 @@
+from requests import Response
+
 from bs4 import BeautifulSoup
 from Fetchers.Fetch_Config import Fetch_Config
 from Models.Job_Listing import Job_Listing
@@ -20,8 +22,10 @@ class Nubank_Config(Fetch_Config):
     @property
     def include_keywords(self) -> list[str]:
         return ["IT", "TI", "engineer", "engenheiro", "Engenheira"]
+    
 
-    def parse_listings(self, soup: BeautifulSoup) -> list[Job_Listing]:
+    def parse_listings(self, response: Response) -> list[Job_Listing]:
+        soup = BeautifulSoup(response.text, "html.parser")
         seen_ids: set[str] = set()
         listings: list[Job_Listing] = []
 

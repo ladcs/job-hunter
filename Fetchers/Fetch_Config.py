@@ -1,6 +1,6 @@
 from abc import ABC, abstractmethod
-from bs4 import BeautifulSoup                        # faltava
 from Models.Job_Listing import Job_Listing
+from requests import Response
 
 class Fetch_Config(ABC):
 
@@ -21,9 +21,9 @@ class Fetch_Config(ABC):
     def include_keywords(self) -> list[str]: ...
 
     @abstractmethod
-    def parse_listings(self, soup: BeautifulSoup) -> list[Job_Listing]:
+    def parse_listings(self, response: Response) -> list[Job_Listing]:
         """
-        Recebe o BeautifulSoup da página e devolve a lista de vagas cruas.
+        Recebe a resposta da requisição e devolve a lista de vagas cruas.
         Cada subclasse sabe como o HTML do seu próprio site é estruturado.
         """
         ...

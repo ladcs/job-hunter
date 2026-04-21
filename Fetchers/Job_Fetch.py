@@ -2,7 +2,6 @@ from __future__ import annotations
 
 import time
 import requests
-from bs4 import BeautifulSoup
 import re
 
 from Fetchers.Fetch_Config import Fetch_Config
@@ -60,8 +59,7 @@ class Job_Fetcher:
         )
         response.raise_for_status()
 
-        soup = BeautifulSoup(response.text, "html.parser")
-        return self._config.parse_listings(soup)
+        return self._config.parse_listings(response)
 
     def _filter(self, listings: list[Job_Listing]) -> list[Job_Listing]:
         return [
