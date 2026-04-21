@@ -1,8 +1,12 @@
 from abc import ABC, abstractmethod
+from typing import List
 from Models.Job_Listing import Job_Listing
 from requests import Response
 
 class Fetch_Config(ABC):
+
+    @property
+    def job_content_selector(self) -> List[str] | None: ...
 
     @property
     @abstractmethod

@@ -8,6 +8,10 @@ from Models.Job_Listing import Job_Listing
 class Nubank_Config(Fetch_Config):
 
     @property
+    def job_content_selector(self) -> list[str]:
+        return ["div.job-description__content", "div.job-page__content"]
+
+    @property
     def url(self) -> str:
         return "https://international.nubank.com.br/careers/brazil/"
 

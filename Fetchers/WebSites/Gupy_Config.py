@@ -1,13 +1,15 @@
 from requests import Response
 from Fetchers.Fetch_Config import Fetch_Config
 from Models.Job_Listing import Job_Listing
-from pprint import pprint
-
 
 class Gupy_Portal_Config(Fetch_Config):
 
     def __init__(self, term: str = "software"):
         self.term = term
+
+    @property
+    def job_content_selector(self) -> list[str]:
+        return None
 
     @property
     def url(self) -> str:
@@ -45,8 +47,7 @@ class Gupy_Portal_Config(Fetch_Config):
                 title=job.get("name", ""),
                 location=location,
                 url=job.get("jobUrl", ""),
+                html=job.get("description", "")
             ))
-        
-        pprint(listings)
 
         return listings

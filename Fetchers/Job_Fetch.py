@@ -28,13 +28,8 @@ class Job_Fetcher:
         self._config = config
         self._request_delay = request_delay
         self._headers = headers or self._DEFAULT_HEADERS
-
         self._raw_listings: list[Job_Listing] = []
         self._filtered_listings: list[Job_Listing] = []
-
-    # ------------------------------------------------------------------
-    # Público
-    # ------------------------------------------------------------------
 
     def fetch(self) -> list[Job_Listing]:
         self._raw_listings = self._scrape()

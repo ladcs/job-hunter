@@ -1,13 +1,27 @@
+from pprint import pprint
+
+import requests
+
 from Fetchers.WebSites.Nubank_Config import Nubank_Config
+from Fetchers.WebSites.Btg_Config import BTGPactual_Config
+from Fetchers.WebSites.B3_Config import B3_Config
+from Fetchers.WebSites.Gupy_Config import Gupy_Portal_Config
 from Fetchers.Job_Fetch import Job_Fetcher
+from Fetchers.util.clean_html import HTMLCleaner
 
-fetcher = Job_Fetcher(config=Nubank_Config())
+config=BTGPactual_Config()
+# config=Gupy_Portal_Config('python')
+
+fetcher = Job_Fetcher(config=config)
 jobs = fetcher.fetch()
+cleaner = HTMLCleaner(selectors = config.job_content_selector)
+job = jobs[0]
+if not job.html:
+    res = requests.get(job.url)
+    job.html = res.text
+job.content = cleaner.extract_job_content(job.html)
 
-print(f"Total na listagem : {fetcher.raw_count}")
-print(f"Após filtro       : {fetcher.filtered_count}\n")
+# pprint(job)
 
-for job in jobs:
-    print(f"[{job.id}] {job.title}")
-    print(f"         {job.location}")
-    print(f"         {job.url}\n")
+print(job.content)
+# print(job.url)

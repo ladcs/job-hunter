@@ -10,6 +10,10 @@ class B3_Config(Fetch_Config):
     @property
     def url(self) -> str:
         return "https://vagas.b3.com.br/go/todas-vagas/4559419/"
+    
+    @property
+    def job_content_selector(self) -> list[str]:
+        return ["div.jobDisplay"]
 
     @property
     def base_job_url(self) -> str:
