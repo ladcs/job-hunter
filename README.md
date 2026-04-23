@@ -102,7 +102,7 @@ Nenhuma outra classe precisa ser modificada.
 
 ## Roadmap
 
-- [ ] Busca de detalhes de cada vaga (`Job_Detail_Fetcher`)
+- [ ] Busca de detalhes de cada vaga (`Job_Details_Fetcher`)
 - [ ] Análise de match por perfil via LLM
 - [ ] Geração de CV e cover letter personalizados por vaga
 - [ ] Notificação por e-mail ou Telegram

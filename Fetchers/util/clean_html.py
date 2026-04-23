@@ -2,6 +2,8 @@ from bs4 import BeautifulSoup
 import html as html_lib
 import re
 
+import emoji
+
 class HTMLCleaner:
 
     def __init__(self, selectors: list[str] = None):
@@ -11,17 +13,7 @@ class HTMLCleaner:
         return "&lt;" in html or "&gt;" in html or "&amp;" in html
 
     def remove_emojis(self, text: str) -> str:
-        emoji_pattern = re.compile(
-            "["
-            "\U0001F600-\U0001F64F"
-            "\U0001F300-\U0001F5FF"
-            "\U0001F680-\U0001F6FF"
-            "\U0001F700-\U0001F77F"
-            "\U0001F780-\U0001F7FF"
-            "]+",
-            flags=re.UNICODE
-        )
-        return emoji_pattern.sub("", text)
+        return emoji.replace_emoji(text, replace=" ")
 
     def clean_html(self, soup: BeautifulSoup) -> str:
         for tag in soup(["script", "style", "noscript", "header", "footer", "svg", "a"]):

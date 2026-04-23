@@ -12,7 +12,7 @@ class BTGPactual_Config(Greenhouse_Config):
 
     @property
     def exclude_keywords(self) -> list[str]:
-        return ["coordenador", "afirmativa","mobile", "flutter", "senior", "security", "staff", "principal", "sênior", "angular"]
+        return ["coordenador", "afirmativa","mobile", "flutter", "senior", "security", "staff", "principal", "sênior", "angular", "lead"]
 
     @property
     def include_keywords(self) -> list[str]:

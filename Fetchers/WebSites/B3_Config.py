@@ -21,11 +21,11 @@ class B3_Config(Fetch_Config):
 
     @property
     def exclude_keywords(self) -> list[str]:
-        return ["senior", "lead", "principal", "manager", "diretor"]
+        return ["senior", "lead", "principal", "manager", "diretor", "sênior", "líder", "gerente", "coordenador", "supervisor", "sr.", "sr", "staff", "sr"]
 
     @property
     def include_keywords(self) -> list[str]:
-        return ["software", "tecnologia", "dados", "QA", "automação", "automacao"]
+        return ["software", "tecnologia", "dados", "automação", "automacao"]
 
     def parse_listings(self, response: Response) -> list[Job_Listing]:
         soup = BeautifulSoup(response.text, "html.parser")

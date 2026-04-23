@@ -21,11 +21,11 @@ class Nubank_Config(Fetch_Config):
 
     @property
     def exclude_keywords(self) -> list[str]:
-        return ["lead", "III", "senior", "security", "exclusiva", "principal", "staff", "SOx"]
+        return ["lead", "iii", "senior", "security", "exclusiva", "principal", "staff", "SOx"]
 
     @property
     def include_keywords(self) -> list[str]:
-        return ["IT", "TI", "engineer", "engenheiro", "Engenheira"]
+        return ["it", "ti", "engineer", "engenheiro", "engenheira"]
     
 
     def parse_listings(self, response: Response) -> list[Job_Listing]:

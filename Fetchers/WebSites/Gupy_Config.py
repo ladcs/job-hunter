@@ -31,7 +31,7 @@ class Gupy_Portal_Config(Fetch_Config):
 
     @property
     def include_keywords(self) -> list[str]:
-        return ["software", "automação", "automacao", "engenheiro", "developer", "desenvolvedor", "desenvolvedora", "engenheira", "QA", "quality assurance"]
+        return ["software", "automação", "automacao", "engenheiro", "developer", "desenvolvedor", "desenvolvedora", "engenheira"]
 
     def parse_listings(self, response: Response) -> list[Job_Listing]:
         data = response.json()

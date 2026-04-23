@@ -11,13 +11,9 @@ class XP_Config(Greenhouse_Config):
         return "https://job-boards.greenhouse.io/xpinc/jobs"
 
     @property
-    def job_content_selector(self) -> list[str]:
-        return ["div#content", "div.job-post"]
-
-    @property
     def exclude_keywords(self) -> list[str]:
-        return ["senior", "sênior", "lead", "staff", "principal", "coordenador", "sr.", "diretor"]
+        return ["senior", "sênior", "lead", "staff", "principal", "coordenador", "sr", "diretor", "exclusiva"]
 
     @property
     def include_keywords(self) -> list[str]:
-        return ["software", "engenheiro", "engenheira", "developer", "desenvolvedor", "desenvolvdora", "automação", "QA"]
+        return ["software", "engenheiro", "engenheira", "developer", "desenvolvedor", "desenvolvdora", "automação"]
