@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+from pprint import pprint
 import re
 import time
 import logging
@@ -7,10 +8,11 @@ import requests
 
 from Fetchers.Fetch_Config import Fetch_Config
 from Fetchers.util.clean_html import HTMLCleaner
-from Models.Job_Listing import Job_Listing
+from Models.Job_Listing import Job_Listing, Requirements, SkillRequirement
 from Ia_generative.api.Ai_model.Request_LLM import Request_LLM
 from Ia_generative.api.Ai_model.OpenAI.Job_Requirement_extractor import Job_Requirement_Extractor_Config
 from Fetchers.util.parse_response_llm import ParseResponseLLM
+from rank_generation.Skills import Skills
 
 logger = logging.getLogger(__name__)
 parse_response_llm = ParseResponseLLM()
@@ -80,7 +82,6 @@ class Job_Details_Fetcher:
         headers: dict | None = None,
         max_years: int = MAX_YEARS,
     ):
-        self._config = config
         self._cleaner = cleaner or HTMLCleaner(selectors=config.job_content_selector)
         self._request_delay = request_delay
         self._headers = headers or self._DEFAULT_HEADERS
@@ -100,11 +101,35 @@ class Job_Details_Fetcher:
         for job in listings:
             if not self._enrich_job(job):
                 continue
-            job.requirements = self.enrich_request(job)
+            job.requirements = self._enrich_request(job)
+            if not job.requirements:
+                continue
+            job.requirements.priority = self._enrich_requiriments_priority(job)
             result.append(job)
         return result
     
-    def enrich_request(self, job: Job_Listing) -> Job_Listing | None:
+    def _enrich_requiriments_priority(self, job: Job_Listing) -> dict:
+        """
+        enrich que pega o que veio do LLM e cria a prioridade por requisito.
+        """
+        priority = {
+            "very_high": [],
+            "high": [],
+            "medium": [],
+            "low": [],
+            "very_low": []
+        }
+        for req in job.requirements.needs:
+            score = Skills.score_skills(req)
+            rank = Skills.rank_skills(score)
+            priority[rank].append(req.skill)
+
+            req.score = score
+            req.rank = rank
+        return priority
+
+
+    def _enrich_request(self, job: Job_Listing) -> Job_Listing | None:
         """
         enrich que usa LLM para extrair requisitos.
         Pode ser usada para pegar os requisitos da vaga.
@@ -115,11 +140,10 @@ class Job_Details_Fetcher:
                 )
             return None
 
-        prompt_config = Job_Requirement_Extractor_Config(job.content)
+        prompt_config = Job_Requirement_Extractor_Config(job.content, job.title)
         llm = Request_LLM(Ai_config=prompt_config)
         try:
-            requirements = llm.model_request()
-            
+            requirements = llm.model_request()            
             return parse_response_llm._parse_requirements(requirements)
         except Exception as e:
             logger.error(
@@ -138,8 +162,6 @@ class Job_Details_Fetcher:
             if html is None:
                 return False
             job.html = html
-
-        print(job.url)
         if not self._passes_experience_filter(job.html, job.title):
             return False
 

@@ -1,9 +1,11 @@
 
 import json
 import logging
+import pprint
 import re
 
-from Models.Job_Listing import Requirements
+
+from Models.Job_Listing import Requirements, SkillRequirement
 
 logger = logging.getLogger(__name__)
 
@@ -15,10 +17,23 @@ class ParseResponseLLM:
 
             if not isinstance(data.get("needs"), list):
                 raise ValueError("needs inválido")
+            
+            needs = [
+                SkillRequirement(**item)
+                for item in data["needs"]
+            ]
+
+            pprint.pprint(needs)
 
             return Requirements(
-                needs=data["needs"],
-                seniority=data.get("seniority"),
+                needs=needs,
+                priority={
+                    "very_high": [],
+                    "high": [],
+                    "medium": [],
+                    "low": [],
+                    "very_low": []
+                }
             )
 
         except Exception as e:
