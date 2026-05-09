@@ -6,7 +6,7 @@ Nenhuma requisição de rede — tudo com HTML/texto fixo.
 """
 
 import pytest
-from Fetchers.util.clean_html import HTMLCleaner
+from Jobs.util.clean_html import HTMLCleaner
 
 
 # ---------------------------------------------------------------------------

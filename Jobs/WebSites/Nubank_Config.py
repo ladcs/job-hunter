@@ -1,7 +1,7 @@
 from requests import Response
 
 from bs4 import BeautifulSoup
-from Fetchers.Fetch_Config import Fetch_Config
+from Jobs.Fetch_Config import Fetch_Config
 from Models.Job_Listing import Job_Listing
 
 
@@ -9,7 +9,7 @@ class Nubank_Config(Fetch_Config):
 
     @property
     def job_content_selector(self) -> list[str]:
-        return ["div.job-description__content", "div.job-page__content"]
+        return ["div.job-description__content",]
 
     @property
     def url(self) -> str:
@@ -21,7 +21,7 @@ class Nubank_Config(Fetch_Config):
 
     @property
     def exclude_keywords(self) -> list[str]:
-        return ["lead", "iii", "senior", "security", "exclusiva", "principal", "staff", "SOx"]
+        return ["lead", "iii", "senior", "security", "exclusiva", "principal", "staff", "SOx", "machine learning"]
 
     @property
     def include_keywords(self) -> list[str]:
@@ -55,3 +55,12 @@ class Nubank_Config(Fetch_Config):
             ))
 
         return listings
+    
+    def _clean_content(self, content: str) -> str:
+        soup = BeautifulSoup(content, "html.parser")
+        contents = self.job_content_selector
+        cont = ""
+        for content in contents:
+            div = soup.find("div", class_=content)
+            
+        return soup.get_text(separator="\n", strip=True)

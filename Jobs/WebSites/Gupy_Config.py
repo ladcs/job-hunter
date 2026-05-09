@@ -1,5 +1,8 @@
+import re
+
+from bs4 import BeautifulSoup
 from requests import Response
-from Fetchers.Fetch_Config import Fetch_Config
+from Jobs.Fetch_Config import Fetch_Config
 from Models.Job_Listing import Job_Listing
 
 class Gupy_Portal_Config(Fetch_Config):
@@ -17,7 +20,6 @@ class Gupy_Portal_Config(Fetch_Config):
         return (
             f"https://employability-portal.gupy.io/api/v1/jobs"
             f"?jobName={term}"
-            f"&state=S%C3%A3o%20Paulo"
             f"&limit=50&offset=0"
         )
 
@@ -27,7 +29,7 @@ class Gupy_Portal_Config(Fetch_Config):
 
     @property
     def exclude_keywords(self) -> list[str]:
-        return ["senior", "sênior", "lead", "staff", "principal", "coordenador", "sr", "afirmativa"]
+        return ["senior", "sênior", "lead", "staff", "principal", "coordenador", "sr", "afirmativa", "Exclusivo para"]
 
     @property
     def include_keywords(self) -> list[str]:
@@ -42,12 +44,35 @@ class Gupy_Portal_Config(Fetch_Config):
             state = job.get("state", "") or ""
             location = f"{city} - {state}".strip(" -") if city or state else "Remoto"
 
+
             listings.append(Job_Listing(
                 id=str(job.get("id", "")),
                 title=job.get("name", ""),
                 location=location,
                 url=job.get("jobUrl", ""),
-                html=job.get("description", "")
+                content_to_llm=None,
+                content=job.get("description", ""),
+                html=None
             ))
-
         return listings
+    
+    def _clean_content(self, html: str) -> str | None:
+
+        soup = BeautifulSoup(html, "html.parser")
+
+        sections_text = []
+        get = ["Responsabilidades e atribuições", "Requisitos e qualificações"]
+
+        for section_name in get:
+            header = soup.find("h2", attrs={
+                "data-testid": f"section-{section_name}-title"
+            })
+            if not header:
+                return
+            div = header.find_parent("div")
+            texto_secao = div.get_text(separator="\n", strip=True)
+            sections_text.append(texto_secao)
+
+        content = "\n\n".join(sections_text)
+
+        return content

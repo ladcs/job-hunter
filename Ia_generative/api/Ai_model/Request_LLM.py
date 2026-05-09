@@ -14,8 +14,5 @@ class Request_LLM:
         client = self._Ai_config.client()
         args = self._Ai_config.args
         response = client.responses.create(**args)
-        print("LLM response:", response.output_text)  # Log the raw response for debugging
-        print("LLM tokens used:", response.usage)  # Log token usage for insight into model behavior
-
         return response.output_text.strip()
         

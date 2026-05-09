@@ -31,3 +31,11 @@ class Fetch_Config(ABC):
         Cada subclasse sabe como o HTML do seu próprio site é estruturado.
         """
         ...
+
+    @abstractmethod
+    def _clean_content(self, html: str) -> str:
+        """
+        Recebe o conteúdo bruto da vaga e devolve o conteúdo limpo.
+        Cada subclasse pode ter regras específicas de limpeza, ou usar um HTMLCleaner genérico.
+        """
+        ...

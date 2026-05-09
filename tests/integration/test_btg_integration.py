@@ -4,8 +4,8 @@ tests/integration/fetchers/test_btg_integration.py
 
 import pytest
 from unittest.mock import MagicMock, patch
-from Fetchers.WebSites.Btg_Config import BTGPactual_Config
-from Fetchers.Job_Fetch import Job_Fetcher
+from Jobs.WebSites.Btg_Config import BTGPactual_Config
+from Jobs.Job_Fetch import Job_Fetcher
 
 
 GREENHOUSE_VOLUME_JSON = {

@@ -1,7 +1,8 @@
 from requests import Response
 from bs4 import BeautifulSoup
+import re
 
-from Fetchers.Fetch_Config import Fetch_Config
+from Jobs.Fetch_Config import Fetch_Config
 from Models.Job_Listing import Job_Listing
 
 
@@ -56,3 +57,27 @@ class B3_Config(Fetch_Config):
             ))
 
         return listings
+    
+    def _clean_content(self, html: str) -> str:
+        soup = BeautifulSoup(html, "html.parser")
+
+        content = soup.get_text(
+            separator="\n",
+            strip=True
+        ).lower()
+
+        content = re.sub(
+            r"^.*?(responsabilidades da área)",
+            r"\1",
+            content,
+            flags=re.IGNORECASE | re.DOTALL
+        )
+
+        content = re.sub(
+            r"benef[ií]cios.*$",
+            "",
+            content,
+            flags=re.IGNORECASE | re.DOTALL
+        )
+
+        return content

@@ -7,9 +7,9 @@ Usa JSON fixo para simular a resposta da API.
 
 import pytest
 from unittest.mock import MagicMock
-from Fetchers.WebSites.Greenhouse.Get_greenhouse import Get_Greenhouse
-from Fetchers.WebSites.Greenhouse.Greenhouse_config import Greenhouse_Config
-from Fetchers.WebSites.Btg_Config import BTGPactual_Config
+from Jobs.WebSites.Greenhouse.Get_greenhouse import Get_Greenhouse
+from Jobs.WebSites.Greenhouse.Greenhouse_config import Greenhouse_Config
+from Jobs.WebSites.Btg_Config import BTGPactual_Config
 
 
 # ---------------------------------------------------------------------------

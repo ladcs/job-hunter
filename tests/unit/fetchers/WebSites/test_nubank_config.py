@@ -7,7 +7,7 @@ Usa HTML fixo para simular a resposta da página de listagem.
 
 import pytest
 from unittest.mock import MagicMock
-from Fetchers.WebSites.Nubank_Config import Nubank_Config
+from Jobs.WebSites.Nubank_Config import Nubank_Config
 
 
 # ---------------------------------------------------------------------------

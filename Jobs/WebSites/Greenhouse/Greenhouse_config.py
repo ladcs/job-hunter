@@ -1,5 +1,5 @@
-from Fetchers.Fetch_Config import Fetch_Config 
-from Fetchers.WebSites.Greenhouse.Get_greenhouse import Get_Greenhouse
+from Jobs.Fetch_Config import Fetch_Config 
+from Jobs.WebSites.Greenhouse.Get_greenhouse import Get_Greenhouse
 from Models.Job_Listing import Job_Listing
 from requests import Response
 

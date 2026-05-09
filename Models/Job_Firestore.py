@@ -1,7 +1,7 @@
 from dataclasses import dataclass, field
 from datetime import datetime, timezone
 
-from Models.Job_Listing import Requirements
+from Models.Job_Listing import SkillRequirement
 
 @dataclass
 class Job_Firestore:
@@ -14,4 +14,4 @@ class Job_Firestore:
     content: str | None = None
     created_at: datetime | None = field(default_factory=lambda: datetime.now(timezone.utc))
     updated_at: datetime | None = None
-    requirements: Requirements | None = None
+    requirements: SkillRequirement | None = None

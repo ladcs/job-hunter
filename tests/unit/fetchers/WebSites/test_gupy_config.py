@@ -4,7 +4,7 @@ tests/unit/fetchers/test_gupy_config.py
 
 import pytest
 from unittest.mock import MagicMock
-from Fetchers.WebSites.Gupy_Config import Gupy_Portal_Config
+from Jobs.WebSites.Gupy_Config import Gupy_Portal_Config
 
 
 GUPY_JSON = {

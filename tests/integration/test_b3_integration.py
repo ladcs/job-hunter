@@ -4,8 +4,8 @@ tests/integration/fetchers/test_b3_integration.py
 
 import pytest
 from unittest.mock import MagicMock, patch
-from Fetchers.WebSites.B3_Config import B3_Config
-from Fetchers.Job_Fetch import Job_Fetcher
+from Jobs.WebSites.B3_Config import B3_Config
+from Jobs.Job_Fetch import Job_Fetcher
 
 
 B3_VOLUME_HTML = """

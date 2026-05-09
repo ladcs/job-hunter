@@ -7,3 +7,5 @@ class Skill_Firestore:
     level: int
     last_used_years: int
     confidence: int
+    category: str | None = None
+    name_normalize: str | None = None

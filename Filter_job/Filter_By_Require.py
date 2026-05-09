@@ -8,7 +8,7 @@ from Models.Job_Listing import Requirements
 from Models.Job_Firestore import Job_Firestore
 from Models.Skill_Firestore import Skill_Firestore
 
-class JobFilterBySkills:
+class Filter_By_Require:
     _weight = {
             "very_high": 5,
             "high": 4,

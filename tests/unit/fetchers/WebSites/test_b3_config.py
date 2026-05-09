@@ -4,7 +4,7 @@ tests/unit/fetchers/test_b3_config.py
 
 import pytest
 from unittest.mock import MagicMock
-from Fetchers.WebSites.B3_Config import B3_Config
+from Jobs.WebSites.B3_Config import B3_Config
 
 
 B3_LISTING_HTML = """

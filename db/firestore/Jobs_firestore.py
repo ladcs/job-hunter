@@ -49,12 +49,23 @@ class Jobs_Firestore:
         batch.commit()
         return doc_ids
 
-    def load_seen_ids(self, source: str) -> set[str]:
+    def load_seen_ids(self, source: str | None) -> set[str]:
         """
         Retorna os job IDs (originais, sem prefixo de source) já existentes
         no Firestore para o source informado.
         Usa apenas o campo 'id' — evita ler o documento inteiro.
         """
+        if not source:
+            docs = (
+                self._db.collection(COLLECTION)
+                .where()
+                .select(["id"])
+                .stream()
+            )
+
+            seen = {doc.get("id") for doc in docs}
+            return seen
+
         docs = (
             self._db.collection(COLLECTION)
             .where(filter=FieldFilter("source", "==", source))

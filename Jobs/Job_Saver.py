@@ -1,10 +1,7 @@
 from __future__ import annotations
 
-import json
 import logging
-from datetime import date
 from dataclasses import asdict
-from pathlib import Path
 from datetime import datetime, timezone
 
 from db.firestore.Jobs_firestore import Jobs_Firestore
@@ -33,7 +30,7 @@ class Job_Saver:
         )
         return new
 
-    def save(self, listings: list[Job_Listing], source: str) -> None:
+    def save(self, listings: list[Job_Listing]) -> None:
         """
         Se o arquivo do dia já existir, faz append.
         Retorna o path do arquivo ou None se não houver nada para salvar.
@@ -44,22 +41,21 @@ class Job_Saver:
 
         existing = []
         for job in listings:
-            existing.append(self._serialize(source, job))
+            existing.append(self._serialize(job))
         try:
             self._jobs_firestore.save_batch(existing)
             logger.info("Salvou %d vagas no Firestore.", len(existing))
         except Exception as e:
             logger.error("Erro ao salvar no Firestore: %s", e)
-        output_path = f"data/temp_{source}_2.json"
-        with open(output_path, "w", encoding="utf-8") as f:
-            json.dump([asdict(job) for job in existing], f, indent=2, ensure_ascii=False)
 
 
 
-    def _serialize(self, source: str, job: Job_Listing) -> Job_Firestore:
+    def _serialize(self, job: Job_Listing) -> Job_Firestore:
         data = asdict(job)
         data.pop("html", None)
-        data["source"] = source
+        data.pop("content_to_llm", None)
         data["is_analyzed"] = False
         data["created_at"] = datetime.now(timezone.utc).isoformat()
+        if not data["requirements"]:
+            data["is_analyzed"] = True
         return Job_Firestore(**data)

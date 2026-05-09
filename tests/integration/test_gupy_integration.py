@@ -4,8 +4,8 @@ tests/integration/fetchers/test_gupy_integration.py
 
 import pytest
 from unittest.mock import MagicMock, patch
-from Fetchers.WebSites.Gupy_Config import Gupy_Portal_Config
-from Fetchers.Job_Fetch import Job_Fetcher
+from Jobs.WebSites.Gupy_Config import Gupy_Portal_Config
+from Jobs.Job_Fetch import Job_Fetcher
 
 
 GUPY_VOLUME_JSON = {

@@ -6,83 +6,70 @@ class Job_Requirement_Extractor_Config(Ai_Config):
     def __init__(self, content: str, title: str):
         super().__init__(prompt = f"""
 You are a job requirements extraction assistant.
-Extract technical skills from the job posting and return structured data.
-Return ONLY valid JSON in this exact format:
+
+Your task is to extract technical skills from a job posting and assign an importance weight to each skill.
+
+Return ONLY valid JSON in the following format:
+
 {{
   "needs": [
     {{
       "skill": "string",
-      "type": "language | framework | tool | concept | platform",
-      "mentions": integer,
-      "in_requirements_section": true or false,
-      "appears_in_responsibilities": true or false,
-      "appears_in_title": true or false,
-      "explicitly_optional": true or false
+      "weight": 1-5
     }}
-  ],
+  ]
 }}
+
 Rules:
-- Extract skills from both title and content
-- Process title and content separately:
-  - If a skill appears in the title:
-    - set appears_in_title = true
-    - add exactly +1 to mentions
-  - If the title text is repeated inside the content:
-    - do NOT count duplicated occurrences from the title again
-- Mentions must reflect unique occurrences across title and content combined
-- Extract only concrete technical skills, and technical profile like graduation:
-  - programming languages (Python, Java, C#)
-  - frameworks (FastAPI, Spring, React)
-  - tools (Git, Jira, Postman)
-  - platforms (AWS, Azure, GCP)
-  - technical concepts (rest api, microservices, ci/cd, oop, solid, dry, clean code, tdd, bdd)
-  - methodologies (agile, scrum, kanban, devops)
-- Do NOT include soft skills (communication, teamwork, etc.)
-- Do NOT include generic phrases (e.g., "experiência prévia", "boa comunicação")
-- Normalize skill names:
-  - lowercase
-  - singular form when possible
-  - examples:
-    - "REST APIs" → "rest api"
-    - "PostgreSQL" → "postgresql"
-    - "APIs" → "rest api" (only if clearly referring to REST APIs)
-    - "SOLID principles" → "solid"
-    - "Orientação a Objetos" → "oop"
-    - "Metodologias Ágeis" → "agile"
+- Return ONLY valid JSON
+- Do NOT explain anything
+- Do NOT return any text outside the JSON
+- All skill names must be lowercase
 - Do NOT duplicate skills
-- Each skill must appear only once
-Field definitions:
-- "mentions": approximate number of times the skill appears (estimate is fine)
-- "in_requirements_section": true if appears under sections like "Requirements", "Requisitos", "O que esperamos" or text indicates obligation (e.g., "required", "must", "necessário", "conhecimento em")
-- "appears_in_responsibilities": true if appears in responsibilities, daily tasks, or job description sections
-- "appears_in_title": true if the skill is explicitly mentioned in the job title
-- "explicitly_optional": true if mentioned as optional (e.g., "nice to have", "diferencial")
-Type classification:
-- language: programming languages (python, java, c#)
-- framework: frameworks and libraries (fastapi, spring, react)
-- tool: tools (git, jira, postman)
-- platform: cloud/platforms (aws, azure, gcp, kubernetes)
-- concept: technical concepts and principles (rest api, microservices, solid, clean code, tdd)
-- methodology: development processes and practices (agile, scrum, kanban, devops)
+- Extract only concrete technical skills
+- Extract only the most relevant technical skills
+- Ignore soft skills
+- Ignore generic terms unless technically relevant
+- Do not infer technologies that are not clearly mentioned
+- Do not use external knowledge
+- Return a raw JSON object.
+- Do NOT wrap the JSON in quotes.
+- Do NOT escape quotes.
+
+Examples of valid skills:
+- python
+- java
+- c#
+- fastapi
+- django
+- spring
+- react
+- aws
+- gcp
+- postgresql
+
+Weight meaning:
+1 = optional or nice-to-have skill
+2 = skill mentioned as a qualification or secondary requirement
+3 = skill mentioned in responsibilities or daily activities
+4 = important mandatory requirement
+5 = primary/core technology directly defining the role identity, usually present in the title
+
 Important constraints:
-- Do NOT infer specific technologies from generic mentions
-  - Example: "API development" ≠ "fastapi"
-- Only include a technology if it is explicitly mentioned or strongly implied
+- Do NOT infer technologies that are not explicitly mentioned
+- "API development" does NOT mean "fastapi"
 - Avoid over-interpreting
-Ignore:
-- Benefits
-- Company description
-- Marketing text
-- UI boilerplate text
-Output must be valid JSON only:
-- No markdown
-- No explanations
-- No trailing commas
-title: {title}
-job_posting:
-\"\"\"
+- Only include technologies explicitly stated or strongly implied
+
+Job title:
+'''
+{title}
+''''
+
+Job content:
+'''
 {content}
-\"\"\"
+'''
 """.strip())
 
     @property

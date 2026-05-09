@@ -4,8 +4,8 @@ tests/integration/fetchers/test_nubank_integration.py
 
 import pytest
 from unittest.mock import MagicMock, patch
-from Fetchers.WebSites.Nubank_Config import Nubank_Config
-from Fetchers.Job_Fetch import Job_Fetcher
+from Jobs.WebSites.Nubank_Config import Nubank_Config
+from Jobs.Job_Fetch import Job_Fetcher
 
 
 NUBANK_VOLUME_HTML = """

@@ -2,11 +2,12 @@
 tests/unit/fetchers/test_job_details_fetch.py
 """
 
+
 import pytest
 import requests as req
 from unittest.mock import MagicMock, patch
-from Fetchers.Job_Details_Fetch import Job_Details_Fetcher
-from Fetchers.util.clean_html import HTMLCleaner
+from Job_listing.Job_Listing_Enrich import Job_Details_Fetcher
+from Jobs.util.clean_html import HTMLCleaner
 from Models.Job_Listing import Job_Listing
 
 
