@@ -1,5 +1,8 @@
 import logging
+from dataclasses import asdict
 from datetime import datetime, timezone
+
+import pprint
 
 from Jobs.WebSites.Nubank_Config import Nubank_Config
 from Jobs.WebSites.Btg_Config import BTGPactual_Config
@@ -10,14 +13,21 @@ from Jobs.WebSites.Xpinc_Config import XP_Config
 from Filter_job.Filter_by_location import Filter_by_location
 from Filter_job.Pre_Filter_By_Title import Pre_Filter_By_Title
 
+from Filter_job.Filter_By_Require import Filter_By_Require
 from Jobs.Job_Fetch import Job_Fetcher
 from Filter_job.Pre_Filter_By_Year import Pre_Filter_By_Year
 from Job_listing.Job_Listing_Enrich import Job_Listing_Enrich
 from Jobs.Job_Saver import Job_Saver
 from db.firestore.Jobs_firestore import Jobs_Firestore
+from db.firestore.Skills_Firestore import Skills_Firestore
 from db.firestore.firestore_client import Firestore_Client
+from Models.Job_Firestore import Job_Firestore
+from Models.Personal_Project import Personal_Project
 
 from Filter_job.Filter_by_cotent_word import Filter_By_Content_Word
+
+from cv.get_project import Used_Skill
+from cv.create_cv import Make_Cv
 
 
 logging.basicConfig(
@@ -39,8 +49,9 @@ SOURCES = [
 
 
 client = Firestore_Client()
-db = Jobs_Firestore(client)
-job_db = Job_Saver(db)
+job_db = Jobs_Firestore(client)
+job_saver = Job_Saver(job_db)
+skill_db = Skills_Firestore(client)
 
 fetch = Job_Fetcher()
 
@@ -60,30 +71,41 @@ def run():
         if not jobs:
             continue
 
-        jobs = job_db.filter_new(jobs, source_name)
+        jobs, not_valid = job_saver.filter_new(jobs, source_name)
+        job_saver.delete_jobs(not_valid, source_name)
         logger.info(f"{source_name}: Novas vagas: {len(jobs)}")
         if not jobs:
             continue
 
 
         jobs = Filter_by_location().filter(jobs)
+
         filtered_count = len(jobs)
+
         logger.info(f"{source_name}: {filtered_count} após filtro por local.")
         if not jobs:
             continue
 
         enrich = Job_Listing_Enrich(config=config)
-        try:
-            jobs = [job for job in jobs if Pre_Filter_By_Year().passes_experience_filter(job.html, job.title)]
-        except Exception as e:
-            logger.error(f"Erro ao {str(job.url)} filtrar por anos de experiência: {str(e)}")
+        aux = []
+        for job in jobs:
+            try:
+                if not job.html:
+                    if Pre_Filter_By_Year().passes_experience_filter(job.content, job.title):
+                        aux.append(job)  
+                elif Pre_Filter_By_Year().passes_experience_filter(job.html, job.title):
+                    aux.append(job)
+            except Exception as e:
+                logger.error(f"Erro no {source_name}_{job.id} ao filtrar por anos de experiência: {str(e)}")
         if not jobs:
             continue
         filtered_count = len(jobs)
         logger.info(f"{source_name}: {filtered_count} após filtro por anos de experiência.")
         if not jobs:
             continue
+
         for job in jobs:
+            job.source = source_name
             if not job.html:
                 
                 try:
@@ -98,7 +120,6 @@ def run():
             
             if source_name.lower() != "nubank":
                 valid = Filter_By_Content_Word(config).filter(job)
-            
                 if not valid:
                     continue
             
@@ -108,22 +129,61 @@ def run():
             enrich.content_to_llm_enrich(job)
             
             enrich.requirements_enrich(job)
-            
-            job.source = source_name
 
         logger.info(f"{source_name}: vagas pos filtragem: {len(jobs)}")    
 
         to_save.extend(jobs)
-    job_db.save(to_save)
+    job_saver.save(to_save)
+
+
+def get_valid_jobs(user_id: str) -> list[Job_Firestore]:
+    filter = Filter_By_Require(skills_firestore=skill_db, jobs_firestore=job_db)
+    jobs = filter.is_valid_jobs_for_user(user_id)
+    return jobs
 
 if __name__ == "__main__":
-    print("----start------")
+    logger.info("----start------")
     begin = datetime.now(timezone.utc)
-    run()
+    # run() # busca novas vagas
+    user_id = "00a713500d1646d88506e234595bdb24"
+    jobs = get_valid_jobs(user_id) # filtra vagas por requisito
+    user_project = Used_Skill()
+    project_cv = [p for p in user_project.get_project(jobs)]
+    personal_project = user_project.personal_project_resume_url(project_cv, job_saver)
+    
+    
+    # import json
+    # with open("test.json", "w") as f:
+    #     json.dump(project_cv, f, indent=4)
+
+    
+    # import json
+    # with open("test_create_resume.json", "w", encoding="utf-8") as f:
+    #     json.dump(
+    #         out_project_cv,
+    #         f,
+    #         indent=4,
+    #         ensure_ascii=False
+    #     )
+
+    # gupy_11283139
+
+    # test = job_db.get("11283139", "gupy")
+    # print(test)
+
+    # get = "test_create_resume.json"
+
+    # with open(get, 'r', encoding='utf-8') as f:
+    #     personal_project = json.load(f)
+
+    cv = Make_Cv()
+    for pp in personal_project:
+    # for i in range(len(personal_project)):
+        actual_personal_project = Personal_Project(**personal_project[i], job_id=f"job-{i}")
+        latex_code = cv.generate_latex(actual_personal_project)
+        cv.create_zip(latex_code, actual_personal_project.job_id)
+    
+
     end = datetime.now(timezone.utc)
     duration = (end - begin).total_seconds()
-
-    print(f"----end------ \nDuration: {duration:.2f} seconds")
-
-    user_id = "00a713500d1646d88506e234595bdb24"
-    
+    logger.info(f"----end------ \nDuration: {duration:.2f} seconds")

@@ -1,5 +1,4 @@
 import logging
-from pprint import pprint
 
 from Ia_generative.api.Ai_model.Ai_config import Ai_Config
 
@@ -14,5 +13,14 @@ class Request_LLM:
         client = self._Ai_config.client()
         args = self._Ai_config.args
         response = client.responses.create(**args)
-        return response.output_text.strip()
+        logger.info(
+            "Tokens usados | input=%s output=%s total=%s",
+            response.usage.input_tokens,
+            response.usage.output_tokens,
+            response.usage.total_tokens
+        )
+        output = response.output_text.strip()
+
+        logger.debug(output)
+        return output
         

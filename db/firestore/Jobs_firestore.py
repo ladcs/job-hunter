@@ -58,22 +58,19 @@ class Jobs_Firestore:
         if not source:
             docs = (
                 self._db.collection(COLLECTION)
-                .where()
-                .select(["id"])
                 .stream()
             )
 
-            seen = {doc.get("id") for doc in docs}
+            seen = {doc.id for doc in docs}
             return seen
 
         docs = (
             self._db.collection(COLLECTION)
             .where(filter=FieldFilter("source", "==", source))
-            .select(["id"])
             .stream()
         )
 
-        seen = {doc.get("id") for doc in docs}
+        seen = {doc.id for doc in docs}
         return seen
 
     def get(self, job_id: str, source: str) -> dict | None:
@@ -99,6 +96,15 @@ class Jobs_Firestore:
         )
         return [doc.to_dict() for doc in docs]
     
+    def get_requeriments_not_none(self) -> list[dict]:
+        docs = (
+            self._db.collection(COLLECTION)
+            .where(filter=FieldFilter("requirements", "!=", None))
+            .stream()
+        )
+
+        return [doc.to_dict() for doc in docs]
+    
     def get_ids_by_date(self, date: datetime) -> list[dict]:
         """
         Retorna os ids das vagas com created_at <= date.
@@ -109,6 +115,16 @@ class Jobs_Firestore:
             .stream()
         )
         return [doc.id for doc in docs]
+    
+    def mark_need_analyzed(self, job_id: str, source: str) -> None:
+        """
+        Marca uma vaga como analisada.
+        """
+        doc_id = self._make_doc_id(source, job_id)
+        self._db.collection(COLLECTION).document(doc_id).update({
+            "is_analyzed": False,
+            "updated_at": datetime.now(timezone.utc),
+        })
 
     def mark_analyzed(self, job_id: str, source: str) -> None:
         """

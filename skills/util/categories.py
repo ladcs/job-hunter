@@ -15,6 +15,7 @@ SKILL_CATEGORIES = {
     "apache pulsar": "messaging",
 
     # databases
+    "azure sql": "relational_database",
     "postgresql": "relational_database",
     "mysql": "relational_database",
     "sql server": "relational_database",
@@ -23,6 +24,7 @@ SKILL_CATEGORIES = {
     "sqlite": "relational_database",
     "db2": "relational_database",
     "sql": "relational_database",
+    "pl/sql": "relational_database",
 
     # nosql
     "mongodb": "nosql",
@@ -36,6 +38,7 @@ SKILL_CATEGORIES = {
     "nosql": "nosql",
 
     # cloud
+    "oracle cloud": "cloud",
     "aws": "cloud",
     "gcp": "cloud",
     "azure": "cloud",
@@ -107,6 +110,9 @@ SKILL_CATEGORIES = {
 
     # methodologies
     "scrum": "agile_methodology",
+    "jira": "agile_methodology",
+    "helix": "agile_methodology",
+    "bmc control-m": "agile_methodology",
     "kanban": "agile_methodology",
     "agile": "agile_methodology",
     "devops": "agile_methodology",
@@ -127,7 +133,9 @@ SKILL_CATEGORIES = {
     "ci/cd": "ci_cd",
 
     # testing
+    "unit testing": "testing",
     "unit test": "testing",
+    "e2e testing": "testing",
     "integration test": "testing",
     "e2e": "testing",
     "xunit": "testing",
@@ -207,13 +215,16 @@ SKILL_CATEGORIES = {
     "airflow": "data_library",
     "hadoop": "data_library",
 
-    # monitoring
+   # monitoring
     "grafana": "monitoring",
     "prometheus": "monitoring",
     "datadog": "monitoring",
     "new relic": "monitoring",
     "elk": "monitoring",
     "splunk": "monitoring",
+    "nagios": "monitoring",
+    "zabbix": "monitoring",
+    "dynatrace": "monitoring",
 
     # cache
     "memcached": "cache",

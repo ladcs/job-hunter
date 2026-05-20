@@ -8,7 +8,7 @@ from Filter_job.Filter_Word_Pre_Llm import Filter_Word_Pre_Llm
 from Models.Job_Listing import Job_Listing
 
 
-INCLUDE_KEYWORDS = ["java", "python", "javascript", "typescript", "c#"]
+INCLUDE_KEYWORDS = ["python", "javascript", "typescript", "c#"]
 
 class Filter_By_Content_Word(Filter_Word_Pre_Llm):
     def __init__(self, config: Fetch_Config, include: List[str] = INCLUDE_KEYWORDS):
@@ -16,12 +16,13 @@ class Filter_By_Content_Word(Filter_Word_Pre_Llm):
         self._include_keywords = include
 
     def filter(self, job: Job_Listing) -> bool:
+        if not job.html:
+            return self._is_included(job.content)
         return  self._is_included(job.html)
     
     def _is_included(self, content: str) -> bool:
         if not self._include_keywords:
             return True
-        
         content_norm = self._normalize(content)
 
         return any(

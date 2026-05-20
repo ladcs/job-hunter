@@ -67,8 +67,11 @@ class Job_Listing_Enrich:
                 skill.skill = normalized_skill
                 category = SKILL_CATEGORIES.get(normalized_skill, None)
                 if not category:
-                    not_categories.append(skill.skill)
-                    continue
+                    if any(word in skill.skill.lower() for word in ["oracle", "aws"]):
+                        category = "cloud"
+                    else:
+                        not_categories.append(skill.skill)
+                        continue
                 skill.category = category
             
         if len(not_categories) > 0:

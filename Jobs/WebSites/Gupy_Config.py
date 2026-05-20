@@ -29,7 +29,7 @@ class Gupy_Portal_Config(Fetch_Config):
 
     @property
     def exclude_keywords(self) -> list[str]:
-        return ["senior", "sênior", "lead", "staff", "principal", "coordenador", "sr", "afirmativa", "Exclusivo para"]
+        return ["senior", "sênior", "lead", "staff", "principal", "coordenador", "sr", "afirmativa", "Exclusivo para", "III"]
 
     @property
     def include_keywords(self) -> list[str]:
