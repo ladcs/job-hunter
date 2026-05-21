@@ -192,14 +192,14 @@ Pós-graduação em Engenharia de Software — Em andamento
         first_line = latex.splitlines()[0].strip()
         url = first_line[1:] if first_line.startswith("%") else ""
 
-        zip_path = Path(f"{filename}.zip")
+        zip_path = Path(f"data/{filename}.zip")
 
         with zipfile.ZipFile(zip_path, "w", zipfile.ZIP_DEFLATED) as zipf:
             # cria o .tex dentro do zip
-            zipf.writestr(f"{filename}.tex", latex)
+            zipf.writestr(f"data/{filename}.tex", latex)
 
             # cria o .txt dentro do zip
-            zipf.writestr(f"{filename}.txt", url)
+            zipf.writestr(f"data/{filename}.txt", url)
 
         return str(zip_path)
             

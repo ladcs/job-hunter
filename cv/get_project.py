@@ -13,9 +13,6 @@ from db.firestore.firestore_client import Firestore_Client
 
 from Jobs.Job_Saver import Job_Saver
 
-from Ia_generative.api.Ai_model.OpenAI.Cv_Resume_Extractor import Cv_Resume_extractor
-from Ia_generative.api.Ai_model.Request_LLM import Request_LLM
-
 from Models.Personal_Project import Personal_Project
 
 json_path_to_cv = "projects/projects.json"
@@ -23,6 +20,9 @@ json_path_to_cv = "projects/projects.json"
 from Models.Job_Listing import SkillRequirement
 
 class Used_Skill:
+    def __init__(self, job_saver: Job_Saver):
+        self.__job_saver = job_saver
+        pass
     def get_text(self, skills: List[SkillRequirement]) -> list[str]:
         with open(json_path_to_cv, 'r') as f:
             skills_used = json.load(f)
@@ -64,23 +64,13 @@ class Used_Skill:
             requires = [SkillRequirement(**req) for req in job.requirements]
             latex = self.get_text(requires)
             to_llm = list()
-            
+
             for l in latex:
                 to_llm.append(self.get_project_to_llm(l, db))
+            if len(to_llm) == 0:
+                self.__job_saver.mark_analized(job.id, job.source)
+                continue
+            
             project_cv.append(Cv_To_Llm(project_latex=latex, content=job.content, url=job.url, title=job.title, project_to_llm=to_llm, job_id=job.id, source=job.source))
-        return project_cv
-    
-    def personal_project_resume_url(self, project_cv: list[Cv_To_Llm], job_saver: Job_Saver) -> list[Personal_Project]:
-        out_project_cv = []
-        for job in project_cv:
-            if job.project_to_llm is []:
-                if job.source != "nubank":
-                    job_saver.mark_analized(job.job_id, job.source)
-                    continue
-            resume = Cv_Resume_extractor(job.content, job.title, job.project_to_llm)
-            resume = Request_LLM(resume).model_request()
-            get_url_resume_project = {"resume": resume, "latex": job.project_latex, "url": job.url, "job_id": f"{job.source}-{job.job_id}"}
-            job_saver.mark_analized(job.job_id, job.source)
-            out_project_cv.append(Personal_Project(**get_url_resume_project))
         
-        return out_project_cv
+        return project_cv
