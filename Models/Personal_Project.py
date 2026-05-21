@@ -7,3 +7,4 @@ class Personal_Project:
     resume: str
     latex: list[str]
     job_id: str
+    source: str

@@ -2,7 +2,7 @@ from Ia_generative.api.Ai_model.Request_LLM import Ai_Config
 from openai import OpenAI
 from core.config import OPENAI_API_KEY
 
-class Cv_Resume_extractor(Ai_Config):
+class History_Gupy_Extractor(Ai_Config):
     def __init__(self, content: str, title: str, project: str):
         super().__init__(prompt = f"""
 Você é um assistente especializado em criação de resumo profissional para currículos.

@@ -13,6 +13,7 @@ class Get_Greenhouse:
             location = job.get("location", {}).get("name", "")
             job_url = job.get("absolute_url", "")
             job_html = html.unescape(job.get("content", ""))
+            job_updated_at = str(job.get("updated_at", None))
 
             listings.append(Job_Listing(
                 id=job_id,
@@ -20,6 +21,7 @@ class Get_Greenhouse:
                 location=location,
                 url=job_url,
                 html=job_html,
+                updated_at=job_updated_at
             ))
 
         return listings

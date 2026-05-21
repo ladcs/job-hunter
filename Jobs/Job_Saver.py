@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import logging
 from dataclasses import asdict
-from datetime import datetime, timezone
+from datetime import datetime, timezone, timedelta
 
 from db.firestore.Jobs_firestore import Jobs_Firestore
 
@@ -17,36 +17,29 @@ class Job_Saver:
     def __init__(self, jobs_firestore: Jobs_Firestore = None):
         self._jobs_firestore = jobs_firestore
 
-    def filter_new(self, listings: list[Job_Listing], source: str) -> list[Job_Listing]:
+    def filter_new(self, listings: list[Job_Listing], source: str) -> tuple[list[Job_Listing], list[str]]:
         """
         Retorna apenas as vagas cujo ID ainda não foi salvo para o source.
         """
         seen_ids = self._jobs_firestore.load_seen_ids(source)
-        ids_coming = [job.id for job in listings]
+        listing_ids = {f"{source}_{job.id}" for job in listings}
+        cutoff = datetime.now(timezone.utc) - timedelta(hours=24)
+
         new = [job for job in listings if f"{source}_{job.id}" not in seen_ids]
-        not_seen = [id for id in seen_ids if id not in ids_coming]
 
-        test = ['gupy_11172732',
-        'gupy_11164240',
-        'gupy_11139404',
-        'gupy_1000005742',
-        'gupy_11274335',
-        'gupy_11258809',
-        'gupy_11243329',
-        'gupy_11217214',
-        'gupy_11259340',
-        'gupy_11251061',
-        'gupy_11106286']
+        updated_ids = [
+            job for job in listings
+            if job.updated_at is not None 
+            and f"{source}_{job.id}" in seen_ids
+            and datetime.fromisoformat(job.updated_at) >= cutoff
+        ]
 
-        if any(test) not in seen_ids:
-            print("_____________________________________________ MERDA")
-            print([f"{source}_{job.id}" for job in new])
+        new.extend(updated_ids)
+        disappeared_ids = [id for id in seen_ids if id not in listing_ids]
+        not_available = [f"{source}_{job.id}" for job in updated_ids]
+        not_available.extend(disappeared_ids)
 
-        logger.info(
-            "Source '%s': %d total, %d novas, %d já vistas.",
-            source, len(listings), len(new), len(listings) - len(new),
-        )
-        return new, not_seen
+        return new, not_available
 
     def save(self, listings: list[Job_Listing]) -> None:
         """

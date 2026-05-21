@@ -27,7 +27,11 @@ from Models.Personal_Project import Personal_Project
 from Filter_job.Filter_by_cotent_word import Filter_By_Content_Word
 
 from cv.get_project import Used_Skill
+from cv.generate_resume import User_Resume
 from cv.create_cv import Make_Cv
+
+from Ia_generative.api.Ai_model.OpenAI.Cv_Resume_Extractor import Cv_Resume_extractor
+from Ia_generative.api.Ai_model.OpenAI.History_Gupy_Extractor import History_Gupy_Extractor
 
 
 logging.basicConfig(
@@ -144,12 +148,20 @@ def get_valid_jobs(user_id: str) -> list[Job_Firestore]:
 if __name__ == "__main__":
     logger.info("----start------")
     begin = datetime.now(timezone.utc)
-    # run() # busca novas vagas
+    run() # busca novas vagas
     user_id = "00a713500d1646d88506e234595bdb24"
     jobs = get_valid_jobs(user_id) # filtra vagas por requisito
-    user_project = Used_Skill()
-    project_cv = [p for p in user_project.get_project(jobs)]
-    personal_project = user_project.personal_project_resume_url(project_cv, job_saver)
+
+    user_project = Used_Skill(job_saver)
+    projects_cv = [p for p in user_project.get_project(jobs)]
+    personal_project = []
+    for project_cv in projects_cv:
+        if project_cv.source != "gupy":
+            to_llm = Cv_Resume_extractor(project_cv.content, project_cv.title, project_cv.project_to_llm)
+        elif to_llm == "gupy":
+            to_llm = History_Gupy_Extractor(project_cv.content, project_cv.title, project_cv.project_to_llm)
+        user_resume = User_Resume(to_llm, job_saver)
+        personal_project.append(user_resume.personal_project_resume_url(project_cv))
     
     
     # import json
@@ -178,8 +190,7 @@ if __name__ == "__main__":
 
     cv = Make_Cv()
     for pp in personal_project:
-    # for i in range(len(personal_project)):
-        actual_personal_project = Personal_Project(**personal_project[i], job_id=f"job-{i}")
+        actual_personal_project = Personal_Project(**pp)
         latex_code = cv.generate_latex(actual_personal_project)
         cv.create_zip(latex_code, actual_personal_project.job_id)
     
@@ -187,3 +198,4 @@ if __name__ == "__main__":
     end = datetime.now(timezone.utc)
     duration = (end - begin).total_seconds()
     logger.info(f"----end------ \nDuration: {duration:.2f} seconds")
+
