@@ -8,24 +8,28 @@ from Models.cvs_to_llm import Cv_To_Llm
 
 from Models.Job_Firestore import Job_Firestore
 from Models.Project_Llm_Firestore import Project_Llm_Firestore
-from db.firestore.Projects_llm import Projects_to_Llm
-from db.firestore.firestore_client import Firestore_Client
+from db.firestore.Projects_Firestore import Projects_Firestore
 
 from Jobs.Job_Saver import Job_Saver
-
-from Models.Personal_Project import Personal_Project
 
 json_path_to_cv = "projects/projects.json"
 
 from Models.Job_Listing import SkillRequirement
 
-class Used_Skill:
-    def __init__(self, job_saver: Job_Saver):
+class Get_Project:
+    def __init__(self, job_saver: Job_Saver, projects_firestore: Projects_Firestore):
         self.__job_saver = job_saver
-        pass
+        self.__projects_to_llm = projects_firestore
+
     def get_text(self, skills: List[SkillRequirement]) -> list[str]:
-        with open(json_path_to_cv, 'r') as f:
-            skills_used = json.load(f)
+        projects = self.__projects_to_llm.get_all()
+        skills_used = {}
+        for project in projects:
+            for skill in project["skills"]:
+                skill_name = skill.lower().strip()
+                if skill_name not in skills_used:
+                    skills_used[skill_name] = []
+                skills_used[skill_name].append(project["latex"])
         
         to_cv = list()
 
@@ -47,26 +51,24 @@ class Used_Skill:
         
         return list(set(to_cv))
     
-    def get_project_to_llm(self, text: str, db: Projects_to_Llm) -> Project_Llm_Firestore:
+    def get_project_to_llm(self, text: str) -> Project_Llm_Firestore:
         match = re.search(r'\\textbf\{([^}]*)\}', text)
         if match:
             content = match.group(1)
         else:
             return
-        return db.get_by_title(content)
+        return self.__projects_to_llm.get_by_title(content)
     
 
     def get_project(self, jobs: list[Job_Firestore]) -> list[Cv_To_Llm]:
         project_cv = []
-        client = Firestore_Client()
-        db = Projects_to_Llm(client)
         for job in jobs:
             requires = [SkillRequirement(**req) for req in job.requirements]
             latex = self.get_text(requires)
             to_llm = list()
 
             for l in latex:
-                to_llm.append(self.get_project_to_llm(l, db))
+                to_llm.append(self.get_project_to_llm(l))
             if len(to_llm) == 0:
                 self.__job_saver.mark_analized(job.id, job.source)
                 continue

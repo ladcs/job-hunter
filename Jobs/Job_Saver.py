@@ -25,7 +25,6 @@ class Job_Saver:
         listing_ids = {f"{source}_{job.id}" for job in listings}
         cutoff = datetime.now(timezone.utc) - timedelta(hours=24)
 
-        new = [job for job in listings if f"{source}_{job.id}" not in seen_ids]
 
         updated_ids = [
             job for job in listings
@@ -33,8 +32,9 @@ class Job_Saver:
             and f"{source}_{job.id}" in seen_ids
             and datetime.fromisoformat(job.updated_at) >= cutoff
         ]
+        
+        new = [job for job in listings if f"{source}_{job.id}" not in seen_ids]
 
-        new.extend(updated_ids)
         disappeared_ids = [id for id in seen_ids if id not in listing_ids]
         not_available = [f"{source}_{job.id}" for job in updated_ids]
         not_available.extend(disappeared_ids)
