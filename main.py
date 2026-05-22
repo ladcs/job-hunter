@@ -18,6 +18,7 @@ from Jobs.Job_Fetch import Job_Fetcher
 from Filter_job.Pre_Filter_By_Year import Pre_Filter_By_Year
 from Job_listing.Job_Listing_Enrich import Job_Listing_Enrich
 from Jobs.Job_Saver import Job_Saver
+from db.firestore.Projects_Firestore import Projects_Firestore
 from db.firestore.Jobs_firestore import Jobs_Firestore
 from db.firestore.Skills_Firestore import Skills_Firestore
 from db.firestore.firestore_client import Firestore_Client
@@ -26,7 +27,7 @@ from Models.Personal_Project import Personal_Project
 
 from Filter_job.Filter_by_cotent_word import Filter_By_Content_Word
 
-from cv.get_project import Used_Skill
+from cv.Get_Project import Get_Project
 from cv.generate_resume import User_Resume
 from cv.create_cv import Make_Cv
 
@@ -56,6 +57,7 @@ client = Firestore_Client()
 job_db = Jobs_Firestore(client)
 job_saver = Job_Saver(job_db)
 skill_db = Skills_Firestore(client)
+project_db = Projects_Firestore(client)
 
 fetch = Job_Fetcher()
 
@@ -152,31 +154,32 @@ if __name__ == "__main__":
     user_id = "00a713500d1646d88506e234595bdb24"
     jobs = get_valid_jobs(user_id) # filtra vagas por requisito
 
-    user_project = Used_Skill(job_saver)
+    user_project = Get_Project(job_saver, project_db)
     projects_cv = [p for p in user_project.get_project(jobs)]
     personal_project = []
     for project_cv in projects_cv:
         if project_cv.source != "gupy":
             to_llm = Cv_Resume_extractor(project_cv.content, project_cv.title, project_cv.project_to_llm)
-        elif to_llm == "gupy":
+        elif project_cv.source == "gupy":
             to_llm = History_Gupy_Extractor(project_cv.content, project_cv.title, project_cv.project_to_llm)
         user_resume = User_Resume(to_llm, job_saver)
         personal_project.append(user_resume.personal_project_resume_url(project_cv))
     
+    to_json = [asdict(pproject) for pproject in personal_project]
     
     # import json
     # with open("test.json", "w") as f:
     #     json.dump(project_cv, f, indent=4)
 
     
-    # import json
-    # with open("test_create_resume.json", "w", encoding="utf-8") as f:
-    #     json.dump(
-    #         out_project_cv,
-    #         f,
-    #         indent=4,
-    #         ensure_ascii=False
-    #     )
+    import json
+    with open("test_create_resume.json", "w", encoding="utf-8") as f:
+        json.dump(
+            to_json,
+            f,
+            indent=4,
+            ensure_ascii=False
+        )
 
     # gupy_11283139
 

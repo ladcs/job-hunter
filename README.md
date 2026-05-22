@@ -1,110 +1,655 @@
-# job-hunter
+# Job Hunter
 
-Agente de monitoramento de vagas de emprego com filtragem inteligente por perfil técnico.
+AI-powered pipeline for job matching and dynamic CV generation based on job requirements and candidate skills.
 
-O projeto faz scraping periódico de páginas de carreira de empresas selecionadas, filtra as vagas por palavras-chave de inclusão e exclusão, e entrega apenas as oportunidades relevantes para o perfil configurado.
+> 🇧🇷 Projeto focado em automação de análise de vagas e geração contextual de currículos utilizando IA com baixo custo operacional.
+> 🇺🇸 Project focused on job analysis automation and contextual CV generation using low-cost AI pipelines.
 
-## Estrutura
+---
 
+# Overview
+
+Job Hunter is a personal portfolio project designed to automate part of the job application workflow.
+
+Instead of automatically applying to jobs, the project focuses on:
+
+* collecting job opportunities from multiple platforms;
+* filtering jobs based on candidate profile;
+* extracting technical requirements using LLMs;
+* generating customized resumes for each position;
+* creating LaTeX-based CVs;
+* organizing and ranking opportunities.
+
+The project was intentionally designed to avoid automated applications due to legal and platform policy concerns.
+
+---
+
+# Main Features
+
+## Job Collection
+
+Collects job listings from multiple sources:
+
+* Gupy
+* Greenhouse
+* Nubank Careers
+* XP Inc
+* BTG Pactual
+* B3 Careers
+
+---
+
+## Smart Filtering Pipeline
+
+The pipeline filters jobs using:
+
+* title analysis;
+* location filtering;
+* keyword filtering;
+* required technologies;
+* years of experience;
+* normalized skills;
+* LLM requirement extraction.
+
+---
+
+## AI Requirement Extraction
+
+Uses OpenAI models to:
+
+* extract technologies from job descriptions;
+* summarize requirements;
+* identify relevant skills;
+* enrich candidate-job matching.
+
+Current model:
+
+* GPT-4.1-mini
+
+---
+
+## Dynamic CV Generation
+
+Generates customized resumes based on:
+
+* candidate projects;
+* personal skills;
+* professional experience;
+* job requirements.
+
+Outputs:
+
+* `.tex`
+* `.txt`
+* `.zip`
+
+---
+
+## Firestore Integration
+
+Stores:
+
+* job listings;
+* user skills;
+* personal projects;
+* generated metadata.
+
+---
+
+## Planned Discord Notifications
+
+Next step:
+
+* automatic Discord notifications with processed jobs and generated resumes.
+
+---
+
+# Pipeline Architecture
+
+```mermaid
+flowchart LR
+
+A[Job Fetch] --> B[HTML Cleaning]
+B --> C[Normalization]
+C --> D[Pre Filters]
+D --> E[LLM Requirement Extraction]
+E --> F[Skill Matching]
+F --> G[Firestore Storage]
+G --> H[Resume Generation]
+H --> I[LaTeX CV]
+I --> J[ZIP Export]
+J --> K[Discord Notification]
 ```
+
+---
+
+# Project Structure
+
+```text
 job-hunter/
-├── main.py
+├── cv/
+├── db/
+├── Filter_job/
+├── Ia_generative/
+├── Job_listing/
+├── Jobs/
 ├── Models/
-│   ├── __init__.py
-│   └── job_listing.py          # estrutura de dados de uma vaga
-└── Fetchers/
-    ├── __init__.py
-    ├── Fetch_Config.py          # contrato abstrato (ABC)
-    ├── Job_Fetch.py             # motor de scraping e filtragem
-    └── WebSites/
-        ├── __init__.py
-        └── Nubank_Config.py     # implementação concreta para o Nubank
+├── rank_generation/
+├── skills/
+├── data/
+└── main.py
 ```
 
-## Como funciona
+Architecture concepts used:
 
-Cada site monitorado é representado por uma subclasse de `Fetch_Config` que define:
+* Object-Oriented Programming (OOP)
+* SOLID principles
+* Layered architecture
+* Modular services
 
-- `url` — página de listagem de vagas
-- `base_job_url` — prefixo para montar a URL de detalhe
-- `exclude_keywords` — vagas descartadas se o título contiver qualquer uma dessas palavras
-- `include_keywords` — vagas aceitas se o título contiver ao menos uma dessas palavras
-- `parse_listings(soup)` — como extrair as vagas do HTML específico daquele site
+---
 
-`Job_Fetcher` recebe qualquer `Fetch_Config` e não conhece nenhum site em particular. A filtragem usa `\b` (word boundary) para evitar falsos positivos de substring — `"TI"` não bate em `"Specialist"`.
+# Tech Stack
+
+## Backend
+
+* Python
+
+## AI
+
+* OpenAI API
+* GPT-4.1-mini
+
+## Database
+
+* Firebase Firestore
+
+## Parsing / Processing
+
+* BeautifulSoup
+
+## CV Generation
+
+* LaTeX
+
+---
+
+# Environment Variables
+
+```env
+OPENAI_API_KEY=
+BOT_TOKEN=
+```
+
+---
+
+# Running the Project
+
+## Install dependencies
+
+```bash
+pip install -r Requirements.txt
+```
+
+## Run
+
+```bash
+python main.py
+```
+
+---
+
+# Current Workflow
+
+1. Fetch job listings
+2. Normalize job data
+3. Filter relevant opportunities
+4. Extract requirements using LLM
+5. Remove incompatible positions
+6. Store jobs in Firestore
+7. Generate contextual resumes
+8. Export LaTeX/TXT/ZIP files
+9. Prepare Discord notifications
+
+---
+
+# Future Improvements
+
+* Cloud deployment
+* Scheduled execution
+* Discord integration
+* Dashboard for monitoring
+* Semantic ranking
+* Embedding-based matching
+* Vector database support
+* Recruiter analytics
+* Resume scoring
+* GCP Cloud Functions deployment
+
+---
+
+# Deployment Notes
+
+The original idea was to deploy using GCP Cloud Functions with free tier resources.
+
+Alternative recommendations for low-cost deployment:
+
+* Railway
+* Render
+* Fly.io
+
+For file storage:
+
+* Cloudflare R2
+
+These platforms provide a simpler deployment experience for Python workers and scheduled pipelines.
+
+---
+
+# Important Notes
+
+This project does NOT perform automatic job applications.
+
+The initial idea included automated applications, but the project direction changed due to:
+
+* legal concerns;
+* platform policies;
+* ethical considerations regarding automation and scraping.
+
+The current focus is:
+
+* job intelligence;
+* smart filtering;
+* contextual resume generation.
+
+---
+
+# Why This Project?
+
+The main goal is to explore:
+
+* AI applied to real-world workflows;
+* low-cost automation;
+* scalable processing pipelines;
+* contextual document generation;
+* software engineering best practices.
+
+---
+
+# Job Hunter
+
+🇧🇷 Plataforma de automação para análise de vagas e geração contextual de currículos utilizando IA.
+🇺🇸 AI-powered platform for job analysis automation and contextual resume generation.
+
+---
+
+# 🇧🇷 Sobre o Projeto
+
+O Job Hunter é um projeto pessoal focado em automatizar parte do processo de busca e preparação para vagas de tecnologia.
+
+Ao invés de realizar candidaturas automáticas, o projeto foi direcionado para:
+
+* coleta de vagas;
+* filtragem inteligente;
+* extração de requisitos utilizando IA;
+* geração contextual de currículos;
+* matching entre perfil profissional e requisitos da vaga.
+
+O objetivo é reduzir trabalho manual durante candidaturas e gerar currículos mais alinhados com cada oportunidade.
+
+---
+
+# 🇺🇸 About the Project
+
+Job Hunter is a personal project focused on automating parts of the job searching workflow.
+
+Instead of automatically applying to jobs, the project focuses on:
+
+* job collection;
+* intelligent filtering;
+* AI requirement extraction;
+* contextual resume generation;
+* candidate-job matching.
+
+The goal is to reduce manual work during applications and generate resumes tailored to each opportunity.
+
+---
+
+# 🇧🇷 Principais Funcionalidades
+
+## Coleta de vagas
+
+Busca vagas em diferentes plataformas:
+
+* Gupy
+* Greenhouse
+* Nubank Careers
+* XP Inc
+* BTG Pactual
+* B3 Careers
+
+---
+
+## Pipeline de filtragem inteligente
+
+O sistema realiza filtros utilizando:
+
+* análise de título;
+* localização;
+* palavras-chave;
+* tecnologias obrigatórias;
+* anos de experiência;
+* normalização de skills;
+* extração de requisitos via LLM.
+
+---
+
+## Extração de requisitos com IA
+
+Utiliza OpenAI para:
+
+* extrair tecnologias da vaga;
+* resumir requisitos;
+* enriquecer matching;
+* identificar habilidades relevantes.
+
+Modelo atual:
+
+* GPT-4.1-mini
+
+---
+
+## Geração dinâmica de currículo
+
+Gera currículos personalizados utilizando:
+
+* projetos pessoais;
+* experiências profissionais;
+* skills cadastradas;
+* requisitos da vaga.
+
+Arquivos gerados:
+
+* `.tex`
+* `.txt`
+* `.zip`
+
+---
+
+## Integração com Firestore
+
+Armazena:
+
+* vagas;
+* skills;
+* projetos;
+* metadados gerados.
+
+---
+
+## Integração com Discord (em desenvolvimento)
+
+Próximo passo:
+
+* envio automático de notificações via Discord.
+
+---
+
+# 🇺🇸 Main Features
+
+## Job Collection
+
+Collects job listings from multiple sources:
+
+* Gupy
+* Greenhouse
+* Nubank Careers
+* XP Inc
+* BTG Pactual
+* B3 Careers
+
+---
+
+## Smart Filtering Pipeline
+
+The pipeline filters jobs using:
+
+* title analysis;
+* location filtering;
+* keyword filtering;
+* required technologies;
+* years of experience;
+* normalized skills;
+* LLM requirement extraction.
+
+---
+
+## AI Requirement Extraction
+
+Uses OpenAI models to:
+
+* extract technologies from job descriptions;
+* summarize requirements;
+* identify relevant skills;
+* enrich candidate-job matching.
+
+Current model:
+
+* GPT-4.1-mini
+
+---
+
+## Dynamic Resume Generation
+
+Generates customized resumes based on:
+
+* candidate projects;
+* professional experience;
+* personal skills;
+* job requirements.
+
+Outputs:
+
+* `.tex`
+* `.txt`
+* `.zip`
+
+---
+
+## Firestore Integration
+
+Stores:
+
+* job listings;
+* user skills;
+* personal projects;
+* generated metadata.
+
+---
+
+## Discord Notifications (planned)
+
+Next step:
+
+* automatic Discord notifications with processed jobs and generated resumes.
+
+---
+
+# Arquitetura / Architecture
+
+```mermaid id="jxjlwm"
+flowchart LR
+
+A[Job Fetch] --> B[HTML Cleaning]
+B --> C[Normalization]
+C --> D[Pre Filters]
+D --> E[LLM Requirement Extraction]
+E --> F[Skill Matching]
+F --> G[Firestore Storage]
+G --> H[Resume Generation]
+H --> I[LaTeX CV]
+I --> J[ZIP Export]
+J --> K[Discord Notification]
+```
+
+---
+
+# Estrutura do Projeto / Project Structure
+
+```text id="mjlwmf"
+job-hunter/
+├── cv/
+├── db/
+├── Filter_job/
+├── Ia_generative/
+├── Job_listing/
+├── Jobs/
+├── Models/
+├── rank_generation/
+├── skills/
+├── data/
+└── main.py
+```
+
+Conceitos utilizados:
+
+* Object-Oriented Programming (OOP)
+* SOLID
+* Arquitetura em camadas
+* Modularização de serviços
+
+---
+
+# Stack Tecnológica / Tech Stack
+
+## Backend
+
+* Python
+
+## IA / AI
+
+* OpenAI API
+* GPT-4.1-mini
+
+## Banco de Dados / Database
+
+* Firebase Firestore
+
+## Parsing
+
+* BeautifulSoup
+
+## Geração de Currículo / Resume Generation
+
+* LaTeX
+
+---
+
+# Variáveis de Ambiente / Environment Variables
+
+```env id="67wfxq"
+OPENAI_API_KEY=
+BOT_TOKEN=
+```
+
+---
+
+# Execução / Running the Project
 
 ## Instalação
 
-```bash
-python3 -m venv .venv
-source .venv/bin/activate
-pip install requests beautifulsoup4
+```bash id="m4ewqy"
+pip install -r Requirements.txt
 ```
 
-## Uso
+## Execução
 
-```bash
-# sempre rodar da raiz do projeto
-python3 main.py
+```bash id="rf6qut"
+python main.py
 ```
 
-```python
-# main.py
-from Fetchers.Job_Fetch import Job_Fetcher
-from Fetchers.WebSites.Nubank_Config import Nubank_Config
+---
 
-fetcher = Job_Fetcher(config=Nubank_Config())
-jobs = fetcher.fetch()
+# Fluxo Atual / Current Workflow
 
-print(f"Total na listagem : {fetcher.raw_count}")
-print(f"Após filtro       : {fetcher.filtered_count}\n")
+1. Busca vagas
+2. Normaliza dados
+3. Filtra oportunidades
+4. Extrai requisitos via IA
+5. Remove vagas incompatíveis
+6. Salva no Firestore
+7. Gera currículos contextualizados
+8. Exporta arquivos LaTeX/TXT/ZIP
+9. Prepara notificações no Discord
 
-for job in jobs:
-    print(f"[{job.id}] {job.title}")
-    print(f"         {job.location}")
-    print(f"         {job.url}\n")
-```
+---
 
-## Adicionando um novo site
+# Próximos Passos / Future Improvements
 
-Crie um arquivo em `Fetchers/WebSites/` herdando de `Fetch_Config`:
+* Deploy em cloud
+* Execução agendada
+* Dashboard web
+* Integração completa com Discord
+* Matching semântico
+* Embeddings
+* Banco vetorial
+* Score de compatibilidade
+* Deploy via GCP Cloud Functions
+* Painel de monitoramento
 
-```python
-from bs4 import BeautifulSoup
-from Fetchers.Fetch_Config import Fetch_Config
-from Models.job_listing import Job_Listing
+---
 
+# Observações Importantes / Important Notes
 
-class Gupy_Config(Fetch_Config):
+O projeto NÃO realiza candidaturas automáticas.
 
-    @property
-    def url(self) -> str:
-        return "https://empresa.gupy.io/..."
+A ideia inicial incluía automação de candidatura, porém o direcionamento mudou devido a:
 
-    @property
-    def base_job_url(self) -> str:
-        return "https://empresa.gupy.io/job"
+* questões legais;
+* políticas das plataformas;
+* preocupações éticas envolvendo automação e scraping.
 
-    @property
-    def exclude_keywords(self) -> list[str]:
-        return ["senior", "lead", "staff", "principal"]
+O foco atual é:
 
-    @property
-    def include_keywords(self) -> list[str]:
-        return ["engineer", "engenheiro", "engenheira", "IT"]
+* inteligência de vagas;
+* filtragem inteligente;
+* geração contextual de currículos.
 
-    def parse_listings(self, soup: BeautifulSoup) -> list[Job_Listing]:
-        # lógica específica do HTML do Gupy
-        ...
-```
+---
 
-Nenhuma outra classe precisa ser modificada.
+# Deploy e Cloud
 
-## Roadmap
+A ideia inicial era utilizar GCP Cloud Functions utilizando free tier.
 
-- [ ] Busca de detalhes de cada vaga (`Job_Details_Fetcher`)
-- [ ] Análise de match por perfil via LLM
-- [ ] Geração de CV e cover letter personalizados por vaga
-- [ ] Notificação por e-mail ou Telegram
-- [ ] Persistência de vagas já vistas (evitar duplicatas entre execuções)
-- [ ] Agendamento via Cloud Scheduler no GCP
+Alternativas recomendadas para deploy de baixo custo:
+
+* Railway
+* Render
+* Fly.io
+
+Para armazenamento de arquivos:
+
+* Cloudflare R2
+
+Essas plataformas simplificam deploy de pipelines Python e execução agendada.
+
+---
+
+# Objetivo do Projeto / Project Goal
+
+Explorar:
+
+* IA aplicada em problemas reais;
+* automação de baixo custo;
+* pipelines escaláveis;
+* geração contextual de documentos;
+* boas práticas de engenharia de software.
+
+---
+
+# Author
+
+Luciano Augusto
+
+GitHub:
+https://github.com/ladcs/job-hunter
